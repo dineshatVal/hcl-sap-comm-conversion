@@ -13,6 +13,7 @@ if not GEMINI_API_KEY:
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)
 model = GenerativeModel('gemini-1.5-flash') # Or 'gemini-1.5-pro' for more complex tasks
+#model = GenerativeModel('gemini-2.5-pro')
 
 INPUT_HCL_CODE_DIR = 'input'
 INPUT_FLOW_DESCRIPTIONS_DIR = 'input/flow_descriptions'
