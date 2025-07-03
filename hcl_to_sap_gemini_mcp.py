@@ -186,6 +186,11 @@ def process_hcl_feature(hcl_code_filepaths, flow_filepath, sap_examples_dir=None
                 relative_path = lines[0].strip()
                 code_content = lines[1].strip()
 
+                if relative_path.startswith('---'):
+                    relative_path = relative_path.lstrip('-').strip()
+                if relative_path.endswith('---'):
+                    relative_path = relative_path.rstrip('-').strip()
+
                 # Remove markdown code block fences if present
                 if code_content.startswith("```") and code_content.endswith("```"):
                     code_content = code_content.lstrip("`").lstrip(code_content.split('\n')[0]).rstrip("`").strip()
