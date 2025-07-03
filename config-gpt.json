@@ -1,0 +1,42 @@
+{
+  "workflow": {
+    "name": "InvoiceDisplayFlow",
+    "description": "Workflow for displaying invoices in HCL Commerce with SAP interface integration, to be converted to SAP Commerce",
+    "platform": "HCL Commerce",
+    "target_platform": "SAP Commerce",
+    "steps": [
+      
+      {
+        "step": 1,
+        "description": "REST API routes to handler",
+        "component": "REST API",
+        "hcl_component": "DisplayInvoicesDataBeanHandler.java",
+        "action": "Maps request to DisplayInvoicesDataBeanHandler.java",
+        "sap_commerce_mapping": "Controller or Service layer"
+      },
+      {
+        "step": 2,
+        "description": "Handler routes to DataBean",
+        "component": "DisplayInvoicesDataBeanHandler.java",
+        "hcl_component": "DisplayInvoicesDataBeanHandler.java",
+        "action": "Forwards request to DisplayInvoicesDataBean.java",
+        "output": {
+          "dataBean": "DisplayInvoicesDataBean.java"
+        },
+        "sap_commerce_mapping": "Service layer or Facade"
+      },
+      {
+        "step": 3,
+        "description": "DataBean executes business logic",
+        "component": "DisplayInvoicesDataBean.java",
+        "hcl_component": "DisplayInvoicesDataBean.java",
+        "action": "Invokes SAP interface IN010 and processes response",
+        "dependencies": {
+          "interface": "SAP IN010",
+          "input": "Invoice query parameters",
+          "output": "SAP response data"
+        },
+        "sap_commerce_mapping": "Service and Integration layer (e.g., SAP Integration Framework)"
+      }
+    ]  }
+}

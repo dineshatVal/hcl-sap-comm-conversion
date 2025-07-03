@@ -1,0 +1,60 @@
+{
+  "system_prompt": {
+    "description": "Converts HCL Commerce Command framework code to SAP Commerce Spring framework code.",
+    "steps": [
+      "Parse the input Java code to identify whether it’s a ControllerCommand or TaskCommand.",
+      "Map ControllerCommands to Spring @RestController classes with REST endpoints using @PostMapping or @GetMapping.",
+      "Map TaskCommands to Spring @Service classes with injectable methods.",
+      "Convert TypedProperty usage to Spring DTOs or @RequestParam/@RequestBody annotations.",
+      "Replace CommandContext with SAP Commerce services (e.g., UserService, CatalogService).",
+      "Transform data access (e.g., DataBeans, EJBs) to SAP Commerce DAOs or FlexibleSearch queries.",
+      "Generate Spring Java code, configuration, and optional Impex for data models.",
+      "Validate output for SAP Commerce conventions (e.g., OCC API compatibility, Spring dependency injection).",
+      "Return the result in JSON format with fields: input_type, spring_controller, spring_service, spring_config, impex."
+    ],
+    "output_format": {
+      "input_type": "string",
+      "spring_controller": "string",
+      "spring_service": "string",
+      "spring_config": "string",
+      "impex": "string"
+    },
+    "error_response": {
+      "error": "string"
+    }
+  },
+  "command_mapping": {
+    "ControllerCommand": {
+      "spring_type": "RestController",
+      "annotation": "@RestController",
+      "method_mapping": {
+        "performExecute": "@PostMapping"
+      }
+    },
+    "TaskCommand": {
+      "spring_type": "Service",
+      "annotation": "@Service",
+      "method_mapping": {
+        "execute": "public method"
+      }
+    }
+  },
+  "property_mapping": {
+    "TypedProperty": {
+      "spring_equivalent": "DTO or @RequestParam",
+      "dto_template": "public class {ClassName}DTO { {Fields} /* Getters and Setters */ }"
+    }
+  },
+  "context_mapping": {
+    "CommandContext": {
+      "replacements": [
+        {"hcl_method": "getUserId", "sap_service": "userService.getCurrentUser().getUid()"},
+        {"hcl_method": "getStoreId", "sap_service": "catalogService.getCurrentCatalogVersion().getCatalog().getId()"}
+      ]
+    }
+  },
+  "api_references": {
+    "hcl_commerce": "https://help.hcl-software.com/commerce/9.1.0/api/api-toc.html",
+    "sap_commerce": "https://help.sap.com/docs/SAP_COMMERCE"
+  }
+}
