@@ -4,6 +4,7 @@ from mcp.server.fastmcp import FastMCP
 import google.generativeai as genai
 from dotenv import load_dotenv
 import json
+import datetime
 
 load_dotenv() # Load environment variables from .env file
 
@@ -14,7 +15,8 @@ if not GEMINI_API_KEY:
 
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)
-model = GenerativeModel('gemini-1.5-flash') # Or 'gemini-1.5-pro' for more complex tasks
+#model = GenerativeModel('gemini-1.5-flash') # Or 'gemini-1.5-pro' for more complex tasks
+model = GenerativeModel('gemini-2.5-pro')
 
 #INPUT_HCL_CODE_DIR = 'input'
 INPUT_HCL_CODE_DIR = "D:\\python-samples\\hcl-sap-poc\\framework-conv-poc\\input" # Change this to your actual input directory
@@ -23,6 +25,9 @@ INPUT_SAP_EXAMPLES_DIR = "D:\\python-samples\\hcl-sap-poc\\framework-conv-poc\\i
 #OUTPUT_SAP_CODE_DIR = 'output'
 OUTPUT_SAP_CODE_DIR = "D:\\python-samples\\hcl-sap-poc\\framework-conv-poc\\output" # Change this to your actual input directory
 OUTPUT_CONVERSION_LOGS_DIR = "D:\\python-samples\\hcl-sap-poc\\framework-conv-poc\\output\\logs"
+
+PROMPT_FILE_PATH = 'D:\\python-samples\\hcl-sap-poc\\framework-conv-poc\\prompts\\sap_commerce_conversion_prompt.txt'
+
 
 # Ensure output directories exist
 os.makedirs(OUTPUT_SAP_CODE_DIR, exist_ok=True)
@@ -47,6 +52,20 @@ def write_file_content(filepath, content):
         print(f"Successfully wrote to {filepath}")
     except Exception as e:
         print(f"Error writing to file {filepath}: {e}")
+
+def load_prompt_template(filepath):
+    """Loads the prompt template from a file."""
+    template = read_file_content(filepath)
+    if template is None:
+        raise FileNotFoundError(f"Prompt template file not found or empty: {filepath}")
+    return template
+
+# Load the prompt template once when the script starts
+try:
+    GLOBAL_PROMPT_TEMPLATE = load_prompt_template(PROMPT_FILE_PATH)
+except FileNotFoundError as e:
+    print(f"Critical error: {e}")
+    exit(1)
 
 def generate_conversion_prompt(hcl_code_content, flow_description, sap_examples=None, filename=""):
     """
@@ -125,6 +144,57 @@ def generate_conversion_prompt(hcl_code_content, flow_description, sap_examples=
     """
     return prompt.strip()
 
+def generate_conversion_prompt_openai(hcl_code_content, flow_description, sap_examples=None, filename=""):
+    """
+    Constructs the prompt for OpenAI models using a loaded template.
+    """
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z%z")
+
+    # The prompt now uses f-string like placeholders for dynamic content
+    # The template itself should contain placeholders like {hcl_code_content}, {flow_description}, etc.
+    # Note: sap_examples section needs conditional formatting, so it's a bit trickier with pure f-strings in a file.
+    # We'll use .format() and handle the optional part separately.
+
+    base_prompt = GLOBAL_PROMPT_TEMPLATE
+
+    # Handle the optional sap_examples section
+    if sap_examples:
+        # If the template has a dedicated {sap_examples} placeholder, populate it directly
+        # Otherwise, you might need to insert it more dynamically
+        # For our current prompt, it's already structured to accept it directly
+        sap_examples_section = f"""
+        **SAP Commerce Framework Examples/Best Practices (for reference):**
+        (These examples demonstrate how SAP Commerce components are typically structured. Please adhere to these patterns.
+        They might include sample `items.xml`, service/DAO/controller implementations, or Spring configurations.)
+        ```sap_commerce_examples
+        {sap_examples}
+        ```
+        """
+    else:
+        # Remove the placeholder or the entire block if no examples are provided
+        # This requires the template to have a clear way to identify the examples block.
+        # A simple way for this prompt structure is to replace it with an empty string
+        # if the template has the {sap_examples} placeholder.
+        sap_examples_section = ""
+        # If your template explicitly includes the examples section even when empty,
+        # you might need to carefully remove it using regex or string manipulation
+        # if you don't want the heading to appear without content.
+        # For simplicity, if {sap_examples} is just a placeholder, passing an empty string
+        # will work if the template is well-designed.
+
+
+    # Use .format() to fill in the variables
+    # Ensure all placeholders in your .txt file are covered here.
+    formatted_prompt = base_prompt.format(
+        current_datetime=current_datetime,
+        hcl_code_content=hcl_code_content,
+        flow_description=flow_description,
+        filename=filename,
+        sap_examples=sap_examples_section.strip() # Pass the formatted section or empty string
+    )
+
+    return formatted_prompt.strip()
+
 def process_hcl_feature(hcl_code_filepaths, flow_filepath, sap_examples_dir=None):
     """
     Processes an HCL Commerce feature for conversion.
@@ -159,7 +229,8 @@ def process_hcl_feature(hcl_code_filepaths, flow_filepath, sap_examples_dir=None
     log_filepath = os.path.join(OUTPUT_CONVERSION_LOGS_DIR, f"{feature_name}_conversion_log.txt")
 
     print(f"Generating prompt for feature: {feature_name}")
-    prompt = generate_conversion_prompt(all_hcl_code, flow_description, sap_examples_content, filename=os.path.basename(hcl_code_filepaths[0] if hcl_code_filepaths else "N/A")) # Using first HCL file name for context
+    #prompt = generate_conversion_prompt(all_hcl_code, flow_description, sap_examples_content, filename=os.path.basename(hcl_code_filepaths[0] if hcl_code_filepaths else "N/A")) # Using first HCL file name for context
+    prompt = generate_conversion_prompt_openai(all_hcl_code, flow_description, sap_examples_content, filename=os.path.basename(hcl_code_filepaths[0] if hcl_code_filepaths else "N/A"))
 
     try:
         # Send to Gemini Code Assist
@@ -251,5 +322,5 @@ def convert_hcl_sap() -> str:
     })
 
 if __name__ == "__main__":
-    #convert_hcl_sap()
-    mcp.run()
+    convert_hcl_sap()
+    #mcp.run()
