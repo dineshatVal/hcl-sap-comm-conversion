@@ -67,83 +67,6 @@ except FileNotFoundError as e:
     print(f"Critical error: {e}")
     exit(1)
 
-def generate_conversion_prompt(hcl_code_content, flow_description, sap_examples=None, filename=""):
-    """
-    Constructs the prompt for Gemini Code Assist.
-    This is the MOST CRITICAL part and needs careful engineering.
-    """
-    prompt = f"""
-    You are an expert in HCL Commerce and SAP Commerce (Hybris) development.
-    Your task is to convert HCL Commerce code for a specific feature into SAP Commerce compliant code,
-    following SAP Commerce framework best practices (e.g., extensions, services, DAOs, controllers, items.xml).
-
-    **Context:**
-    I am providing you with HCL Commerce code for a feature and a text description of its functional flow.
-    Your goal is to understand the HCL code's purpose within this flow and then re-implement it using SAP Commerce principles.
-
-    **HCL Commerce Code (from file: {filename}):**
-    ```hcl
-    {hcl_code_content}
-    ```
-
-    **Feature Flow Description:**
-    ```text
-    {flow_description}
-    ```
-    """
-
-    if sap_examples:
-        prompt += f"""
-        **SAP Commerce Framework Examples/Best Practices (for reference):**
-        (These examples demonstrate how SAP Commerce components are typically structured. Please adhere to these patterns.)
-        ```sap_commerce_examples
-        {sap_examples}
-        ```
-        """
-
-    prompt += """
-    **Conversion Instructions:**
-    1.  **Analyze the HCL Code:** Understand its functionality, dependencies, and business logic within the context of the provided flow description.
-    2.  **Identify SAP Commerce Equivalents:** Determine how the HCL functionality maps to SAP Commerce concepts (e.g., servlets to controllers, custom tables to items.xml, custom logic to services/DAOs).
-    3.  **Generate SAP Commerce Code:**
-        * Create new files as needed (e.g., `MyFeatureService.java`, `MyFeatureDAO.java`, `MyFeatureController.java`, `myfeature-items.xml`, Spring configuration XMLs).
-        * Ensure the generated code adheres strictly to SAP Commerce's framework, naming conventions, and best practices.
-        * Use the provided SAP Commerce examples as a guide for structure and coding style.
-        * Do not just translate syntax; re-architect if necessary to fit the SAP Commerce paradigm.
-        * Add comments to explain the conversion logic and any assumptions made.
-        * If a direct conversion is not feasible or requires significant re-design, indicate that and suggest a high-level approach.
-    4.  **Output Format:** Provide the converted SAP Commerce code for each generated file, clearly separated, with the suggested filename for each.
-
-    **Example Output Format (start your response like this, generating all relevant files):**
-
-    --- FILE: path/to/my/extension/src/myextension/core/service/impl/DefaultMyFeatureService.java ---
-    ```java
-    // SAP Commerce compliant Java code for DefaultMyFeatureService
-    // ...
-    ```
-
-    --- FILE: path/to/my/extension/src/myextension/core/dao/impl/DefaultMyFeatureDAO.java ---
-    ```java
-    // SAP Commerce compliant Java code for DefaultMyFeatureDAO
-    // ...
-    ```
-
-    --- FILE: path/to/my/extension/web/src/myextension/controller/MyFeatureController.java ---
-    ```java
-    // SAP Commerce compliant Java code for MyFeatureController
-    // ...
-    ```
-
-    --- FILE: path/to/my/extension/resources/myextension-items.xml ---
-    ```xml
-    ```
-
-    --- FILE: path/to/my/extension/resources/myextension-spring.xml ---
-    ```xml
-    ```
-    """
-    return prompt.strip()
-
 def generate_conversion_prompt_openai(hcl_code_content, flow_description, sap_examples=None, filename=""):
     """
     Constructs the prompt for OpenAI models using a loaded template.
@@ -229,7 +152,6 @@ def process_hcl_feature(hcl_code_filepaths, flow_filepath, sap_examples_dir=None
     log_filepath = os.path.join(OUTPUT_CONVERSION_LOGS_DIR, f"{feature_name}_conversion_log.txt")
 
     print(f"Generating prompt for feature: {feature_name}")
-    #prompt = generate_conversion_prompt(all_hcl_code, flow_description, sap_examples_content, filename=os.path.basename(hcl_code_filepaths[0] if hcl_code_filepaths else "N/A")) # Using first HCL file name for context
     prompt = generate_conversion_prompt_openai(all_hcl_code, flow_description, sap_examples_content, filename=os.path.basename(hcl_code_filepaths[0] if hcl_code_filepaths else "N/A"))
 
     try:
