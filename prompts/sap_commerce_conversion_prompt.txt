@@ -27,6 +27,7 @@ and Spring MVC Controllers.
 
 {sap_examples}
 
+**This is for SAP Commerce 22.05 version and so the generated code be inline with this version**
 **SAP Commerce Cloud Best Practices and Requirements (Strict Adherence Required):**
 
 1.  **Extension Structure:** Assume the converted code will reside within a custom SAP Commerce extension.
@@ -130,6 +131,16 @@ and Spring MVC Controllers.
 7.  **Generate ImpEx (if data creation is part of the flow):** If the HCL code involved creating specific data instances, generate sample ImpEx for those.
 8.  **Add Explanatory Comments:** Include comments in the generated code explaining the conversion logic, design choices, and any assumptions made. Highlight areas that might require manual review or further refinement.
 9.  **Prioritize Standard Hybris APIs:** Whenever possible, use out-of-the-box SAP Commerce services and APIs (e.g., `modelService`, `flexibleSearchService`, `userService`, `cartService`, etc.) instead of re-implementing common functionality.
+
+13. Structure the generated code according to Clean Architecture principles (see https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html):
+ 1. Place business/domain logic in pure Java classes (entities, domain services) that do not depend on frameworks or external libraries.
+ 2. Application/use case logic should coordinate business rules and be independent of frameworks.
+ 3. Interface adapters (controllers, DTOs, facades, populators) should convert between external formats and internal models.
+ 4. Framework and infrastructure code (Spring, Hybris, database, web) should be in the outermost layer and depend on interfaces defined in the inner layers.
+ 5. Use dependency inversion: outer layers depend on abstractions (interfaces) defined by inner layers.
+ 6. Organize code into packages/folders such as domain, application, adapters, and infrastructure for clarity.
+ 7. Controllers should be thin and delegate to use case/application services.
+ 8. Data access should be via interfaces, with implementations in the infrastructure layer.
 
 **Output Format:**
 Provide the converted SAP Commerce code for each generated file. Each file should be clearly separated using the delimiter `--- FILE: <suggested/relative/path/from/extension/root> ---`. Do not include any conversational text before or after the file contents, only the file content itself.
