@@ -163,7 +163,9 @@ Provide the converted SAP Commerce code for each generated file. Each file shoul
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<items xmlns:xsi="[http://www.w3.org/2001/XMLSchema-instance](http://www.w3.org/2001/XMLSchema-instance)" xsi:noNamespaceSchemaLocation="items.xsd">
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="items.xsd">
     <collectiontypes>
         <collectiontype code="MyCustomStringList" elementtype="java.lang.String" autocreate="true" generate="true"/>
     </collectiontypes>
@@ -204,16 +206,17 @@ Provide the converted SAP Commerce code for each generated file. Each file shoul
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="[http://www.springframework.org/schema/beans](http://www.springframework.org/schema/beans)"
-       xmlns:xsi="[http://www.w3.org/2001/XMLSchema-instance](http://www.w3.org/2001/XMLSchema-instance)"
-       xmlns:aop="[http://www.springframework.org/schema/aop](http://www.springframework.org/schema/aop)"
-       xmlns:context="[http://www.springframework.org/schema/context](http://www.springframework.org/schema/context)"
-       xsi:schemaLocation="[http://www.springframework.org/schema/beans](http://www.springframework.org/schema/beans)
-       [http://www.springframework.org/schema/beans/spring-beans.xsd](http://www.springframework.org/schema/beans/spring-beans.xsd)
-       [http://www.springframework.org/schema/aop](http://www.springframework.org/schema/aop)
-       [http://www.springframework.org/schema/aop/spring-aop.xsd](http://www.springframework.org/schema/aop/spring-aop.xsd)
-       [http://www.springframework.org/schema/context](http://www.springframework.org/schema/context)
-       [http://www.springframework.org/schema/context/spring-context.xsd](http://www.springframework.org/schema/context/spring-context.xsd)">
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config/>
 
@@ -238,14 +241,9 @@ Provide the converted SAP Commerce code for each generated file. Each file shoul
 --- FILE: myextension/resources/myextension-spring-beans.xml ---
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="[http://www.springframework.org/schema/beans](http://www.springframework.org/schema/beans)"
-       xmlns:xsi="[http://www.w3.org/2001/XMLSchema-instance](http://www.w3.org/2001/XMLSchema-instance)"
-       xmlns:context="[http://www.springframework.org/schema/context](http://www.springframework.org/schema/context)"
-       xsi:schemaLocation="[http://www.springframework.org/schema/beans](http://www.springframework.org/schema/beans)
-       [http://www.springframework.org/schema/beans/spring-beans.xsd](http://www.springframework.org/schema/beans/spring-beans.xsd)
-       [http://www.springframework.org/schema/context](http://www.springframework.org/schema/context)
-       [http://www.springframework.org/schema/context/spring-context.xsd](http://www.springframework.org/schema/context/spring-context.xsd)">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
 
     <alias name="defaultMyFeatureData" alias="myFeatureData"/>
     <bean id="defaultMyFeatureData" class="de.myproject.myextension.data.MyFeatureDataDTO" scope="prototype"/>
